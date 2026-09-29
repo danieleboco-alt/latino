@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape Room Latina - Il Segreto della Tabula Verborum</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --gold-hover: #f3e5ab;
+            --dark-bg: #121016;
+            --card-bg: rgba(28, 25, 38, 0.95);
+            --border-color: #4a3b2c;
+            --text-color: #e6dfd5;
+            --accent-red: #8b0000;
+            --accent-green: #2e7d32;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--dark-bg);
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(20, 15, 25, 0.8), rgba(10, 8, 12, 0.98)),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z' fill='%23d4af37' fill-opacity='0.03'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1, h2, h3, .roman-font {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 15px;
+            position: relative;
+        }
+
+        header h1 {
+            color: var(--gold);
+            font-size: 2.2rem;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 1rem;
+            color: #b3a89b;
+            font-style: italic;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--border-color);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+        }
+
+        .timer-box, .hints-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .timer-display {
+            font-size: 1.4rem;
+            color: var(--gold);
+            font-family: monospace;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4a3b2c 0%, #2a1f18 100%);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            font-family: 'Cinzel', serif;
+        }
+
+        .btn:hover {
+            background: var(--gold);
+            color: #000;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, #8b0000 0%, #4a0000 100%);
+            color: #fff;
+            border-color: #ff4d4d;
+        }
+
+        .btn-action:hover {
+            background: #a00000;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
+        }
+
+        .room-nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .room-tab {
+            padding: 10px 18px;
+            background: rgba(20, 18, 25, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            color: #8c8275;
+            transition: all 0.3s ease;
+        }
+
+        .room-tab.active {
+            border-color: var(--gold);
+            color: var(--gold);
+            background: rgba(212, 175, 55, 0.15);
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
+        }
+
+        .room-tab.solved {
+            border-color: var(--accent-green);
+            color: #81c784;
+        }
+
+        .room-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            position: relative;
+            display: none;
+        }
+
+        .room-card.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .room-title {
+            color: var(--gold);
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .story-text {
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #d1c7bd;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-left: 3px solid var(--gold);
+            border-radius: 0 6px 6px 0;
+            font-size: 0.95rem;
+        }
+
+        .puzzle-area {
+            margin: 25px 0;
+            background: rgba(15, 12, 20, 0.6);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .word-tag {
+            background: rgba(45, 38, 58, 0.8);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            text-align: center;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #e6dfd5;
+        }
+
+        .word-tag:hover {
+            border-color: var(--gold);
+            transform: translateY(-2px);
+        }
+
+        .word-tag.selected {
+            background: var(--gold);
+            color: #000;
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        .drop-zones {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .drop-zone {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 120px;
+            text-align: center;
+        }
+
+        .drop-zone h4 {
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .drop-zone-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .matching-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .matching-table th, .matching-table td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            text-align: left;
+        }
+
+        .matching-table th {
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold);
+        }
+
+        select {
+            background: #1a1622;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            border-radius: 4px;
+            width: 100%;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        .digit-lock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin: 30px 0;
+            background: rgba(0,0,0,0.5);
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid var(--gold);
+        }
+
+        .lock-digits {
+            display: flex;
+            gap: 15px;
+        }
+
+        .digit-input {
+            width: 60px;
+            height: 80px;
+            background: #0a080c;
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            color: var(--gold);
+            font-size: 2.5rem;
+            text-align: center;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.9);
+        }
+
+        .digit-input:focus {
+            outline: none;
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.8), inset 0 0 10px rgba(0,0,0,0.9);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+
+        .feedback.correct {
+            display: block;
+            background: rgba(46, 125, 50, 0.2);
+            border: 1px solid var(--accent-green);
+            color: #81c784;
+        }
+
+        .feedback.incorrect {
+            display: block;
+            background: rgba(139, 0, 0, 0.2);
+            border: 1px solid #ff4d4d;
+            color: #ff8080;
+        }
+
+        .digit-reveal {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--gold);
+            border-radius: 6px;
+            color: var(--gold);
+            font-weight: bold;
+            text-align: center;
+            display: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            padding: 25px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: #fff;
+        }
+
+        .certificate {
+            background: #fdfbf7;
+            color: #2b231d;
+            padding: 30px;
+            border: 10px double #8b6b23;
+            border-radius: 4px;
+            text-align: center;
+            margin-top: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: none;
+        }
+
+        .certificate h2 {
+            font-size: 2.2rem;
+            color: #5c4018;
+            margin-bottom: 10px;
+        }
+
+        .certificate h3 {
+            font-size: 1.4rem;
+            color: #8b6b23;
+            margin-bottom: 20px;
+        }
+
+        .certificate p {
+            font-size: 1.1rem;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        .certificate-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            border-bottom: 2px solid #8b6b23;
+            display: inline-block;
+            padding: 0 20px;
+            margin: 15px 0;
+            color: #2b231d;
+            font-family: 'Cinzel', serif;
+        }
+
+        .pronunciation-rule {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid var(--gold);
+            padding: 10px 15px;
+            margin-bottom: 12px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .pronunciation-rule strong {
+            color: var(--gold);
+        }
+
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.6rem; }
+            .digit-input { width: 45px; height: 60px; font-size: 1.8rem; }
+            .room-card { padding: 15px; }
+            .stats-bar { flex-direction: column; gap: 10px; }
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .certificate, .certificate * {
+                visibility: visible;
+            }
+            .certificate {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                border: 4px double #000;
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>IL SEGRETO DELLA TABULA VERBORUM</h1>
+            <p>Escape Room Didattica di Avviamento al Latino</p>
+        </header>
+
+        <div class="stats-bar">
+            <div class="timer-box">
+                <span>⏱️ Tempo Rimanente:</span>
+                <span class="timer-display" id="timer">45:00</span>
+            </div>
+            <div class="hints-box">
+                <span>💡 Indizi Usati:</span>
+                <span id="hint-count" style="color: var(--gold);">0 / 3</span>
+                <button class="btn btn-small" onclick="requestHint()">Chiedi Indizio</button>
+            </div>
+            <div>
+                <button class="btn btn-small" onclick="toggleAudio()">🔊 Audio: <span id="audio-status">ON</span></button>
+                <button class="btn btn-small" onclick="openTeacherModal()" style="margin-left: 5px;">⚙️ Docente</button>
+            </div>
+        </div>
+
+        <div class="room-nav">
+            <div class="room-tab active" id="tab-1" onclick="switchRoom(1)">I. Generi</div>
+            <div class="room-tab" id="tab-2" onclick="switchRoom(2)">II. Numeri</div>
+            <div class="room-tab" id="tab-3" onclick="switchRoom(3)">III. Vocabolario</div>
+            <div class="room-tab" id="tab-4" onclick="switchRoom(4)">IV. Pronuncia</div>
+            <div class="room-tab" id="tab-5" onclick="switchRoom(5)">🔐 Lucchetto Finale</div>
+        </div>
+
+        <!-- STANZA 1: GENERI DEI NOMI -->
+        <div class="room-card active" id="room-1">
+            <h2 class="room-title">Stanza I: Il Laboratorio dei Tre Generi</h2>
+            <div class="story-text">
+                Sei entrato nello scriptorium dell'antico grammatico romano Marco. Sulla scrivania trovi dei rotoli di papiro confusi. In latino i nomi possono essere <strong>Maschili (m.)</strong>, <strong>Femminili (f.)</strong> o <strong>Neutri (n.)</strong>. Per ottenere la prima cifra della combinazione segreta, devi ordinare correttamente i nomi scritti sui frammenti.
+            </div>
+
+            <div class="puzzle-area">
+                <p><strong>Istruzione:</strong> Seleziona una parola e poi clicca sul contenitore del genere corrispondente (aiutati osservando le terminazioni tipiche: <em>-a</em> femm., <em>-us/puer</em> masc., <em>-um</em> neutro).</p>
+                
+                <div class="word-grid" id="s1-words">
+                    <div class="word-tag" onclick="selectWord(this, 'rosa')">rosa</div>
+                    <div class="word-tag" onclick="selectWord(this, 'lupus')">lupus</div>
+                    <div class="word-tag" onclick="selectWord(this, 'bellum')">bellum</div>
+                    <div class="word-tag" onclick="selectWord(this, 'puella')">puella</div>
+                    <div class="word-tag" onclick="selectWord(this, 'donum')">donum</div>
+                    <div class="word-tag" onclick="selectWord(this, 'puer')">puer</div>
+                    <div class="word-tag" onclick="selectWord(this, 'silva')">silva</div>
+                    <div class="word-tag" onclick="selectWord(this, 'templum')">templum</div>
+                    <div class="word-tag" onclick="selectWord(this, 'amicus')">amicus</div>
+                </div>
+
+                <div class="drop-zones">
+                    <div class="drop-zone" onclick="placeWord('masculinum')">
+                        <h4>Maschile (m.)</h4>
+                        <div class="drop-zone-content" id="zone-masculinum"></div>
+                    </div>
+                    <div class="drop-zone" onclick="placeWord('femininum')">
+                        <h4>Femminile (f.)</h4>
+                        <div class="drop-zone-content" id="zone-femininum"></div>
+                    </div>
+                    <div class="drop-zone" onclick="placeWord('neutrum')">
+                        <h4>Neutro (n.)</h4>
+                        <div class="drop-zone-content" id="zone-neutrum"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-action" onclick="checkRoom1()">Verifica Classificazione</button>
+            <button class="btn" onclick="resetRoom1()" style="margin-left: 10px;">Azzera</button>
+
+            <div class="feedback" id="feedback-1"></div>
+            <div class="digit-reveal" id="reveal-1">✨ PRIMA CIFRA DEL LUCCHETTO: <span id="digit-1-val" style="font-size: 1.5rem;"></span> ✨</div>
+        </div>
+
+        <!-- STANZA 2: SINGOLARI E PLURALI -->
+        <div class="room-card" id="room-2">
+            <h2 class="room-title">Stanza II: La Galleria dei Numeri</h2>
+            <div class="story-text">
+                Avanzando nella biblioteca, ti trovi di fronte a due grandi statue: una rappresenta l'Unità (<strong>Singolare</strong>), l'altra la Moltitudine (<strong>Plurale</strong>). In latino le terminazioni dei nomi cambiano se si tratta di una sola cosa o di molte cose. Abbina ogni forma singolare al suo corretto plurale.
+            </div>
+
+            <div class="puzzle-area">
+                <table class="matching-table">
+                    <thead>
+                        <tr>
+                            <th>Nome Singolare</th>
+                            <th>Traduzione</th>
+                            <th>Seleziona il Plurale Corretto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>aqua</strong> (1ª decl.)</td>
+                            <td>l'acqua</td>
+                            <td>
+                                <select id="s2-match-1">
+                                    <option value="">-- Scegli il plurale --</option>
+                                    <option value="aquas">aquas</option>
+                                    <option value="aquae">aquae</option>
+                                    <option value="aqui">aqui</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>lupus</strong> (2ª decl. m.)</td>
+                            <td>il lupo</td>
+                            <td>
+                                <select id="s2-match-2">
+                                    <option value="">-- Scegli il plurale --</option>
+                                    <option value="lupi">lupi</option>
+                                    <option value="lupae">lupae</option>
+                                    <option value="lupos">lupos</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>donum</strong> (2ª decl. n.)</td>
+                            <td>il dono</td>
+                            <td>
+                                <select id="s2-match-3">
+                                    <option value="">-- Scegli il plurale --</option>
+                                    <option value="doni">doni</option>
+                                    <option value="dona">dona</option>
+                                    <option value="donis">donis</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>magistra</strong> (1ª decl.)</td>
+                            <td>la maestra</td>
+                            <td>
+                                <select id="s2-match-4">
+                                    <option value="">-- Scegli il plurale --</option>
+                                    <option value="magistri">magistri</option>
+                                    <option value="magistrae">magistrae</option>
+                                    <option value="magistras">magistras</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>servus</strong> (2ª decl. m.)</td>
+                            <td>il servo</td>
+                            <td>
+                                <select id="s2-match-5">
+                                    <option value="">-- Scegli il plurale --</option>
+                                    <option value="servi">servi</option>
+                                    <option value="servae">servae</option>
+                                    <option value="servum">servum</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <button class="btn btn-action" onclick="checkRoom2()">Verifica Abbinamenti</button>
+            <div class="feedback" id="feedback-2"></div>
+            <div class="digit-reveal" id="reveal-2">✨ SECONDA CIFRA DEL LUCCHETTO: <span id="digit-2-val" style="font-size: 1.5rem;"></span> ✨</div>
+        </div>
+
+        <!-- STANZA 3: CACCIA AL VOCABOLARIO -->
+        <div class="room-card" id="room-3">
+            <h2 class="room-title">Stanza III: Il Codice del Vocabolario</h2>
+            <div class="story-text">
+                Hai trovato un antico dizionario di latino su un leggio. Per usare bene il vocabolario, bisogna saper leggere le sue <strong>abbreviazioni</strong>! Dimostra di saper consultare il dizionario rispondendo alle domande sulle abbreviazioni e le entrate del vocabolario.
+            </div>
+
+            <div class="puzzle-area">
+                <div style="margin-bottom: 20px;">
+                    <p><strong>1. L'abbreviazione <em style="color:var(--gold);">"n."</em> accanto a una parola sul vocabolario significa:</strong></p>
+                    <select id="s3-q1" style="margin-top: 5px;">
+                        <option value="">-- Seleziona risposta --</option>
+                        <option value="nome">Nome comune</option>
+                        <option value="neutro">Genere Neutro</option>
+                        <option value="numero">Numero plurale</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <p><strong>2. Sul vocabolario trovi l'entrata: <em style="color:var(--gold);">"rosa, -ae, f."</em>. Che cosa indica la lettera <em style="color:var(--gold);">"f."</em>?</strong></p>
+                    <select id="s3-q2" style="margin-top: 5px;">
+                        <option value="">-- Seleziona risposta --</option>
+                        <option value="femminile">Che il nome è di genere Femminile</option>
+                        <option value="futuro">Che è un verbo al futuro</option>
+                        <option value="fine">Che appartiene alla fine della declinazione</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <p><strong>3. Cercando il nome plurale <em style="color:var(--gold);">"lupi"</em> sul vocabolario, sotto quale forma base (paradigma/nominativo singolare) devi cercarlo?</strong></p>
+                    <select id="s3-q3" style="margin-top: 5px;">
+                        <option value="">-- Seleziona risposta --</option>
+                        <option value="lupi">Lupi</option>
+                        <option value="lupum">Lupum</option>
+                        <option value="lupus">Lupus</option>
+                    </select>
+                </div>
+
+                <div>
+                    <p><strong>4. Quale tra questi simboli indica che un sostantivo è di genere Maschile?</strong></p>
+                    <select id="s3-q4" style="margin-top: 5px;">
+                        <option value="">-- Seleziona risposta --</option>
+                        <option value="m">m.</option>
+                        <option value="masc">Masc.</option>
+                        <option value="mas">ms.</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn btn-action" onclick="checkRoom3()">Verifica Risposte Vocabolario</button>
+            <div class="feedback" id="feedback-3"></div>
+            <div class="digit-reveal" id="reveal-3">✨ TERZA CIFRA DEL LUCCHETTO: <span id="digit-3-val" style="font-size: 1.5rem;"></span> ✨</div>
+        </div>
+
+        <!-- STANZA 4: PRONUNCIA LATINA -->
+        <div class="room-card" id="room-4">
+            <h2 class="room-title">Stanza IV: L'Eco degli Antichi (Pronuncia Latina)</h2>
+            <div class="story-text">
+                Sei giunto nella Stanza dell'Eco. Per sbloccare l'ultima cifra devi dimostrare di conoscere le regole della <strong>pronuncia latina scolastica (o ecclesiastica)</strong> usata comunemente in Italia.
+            </div>
+
+            <div class="puzzle-area">
+                <h4 style="color: var(--gold); margin-bottom: 12px;">Regole da Ricordare:</h4>
+                <div class="pronunciation-rule">
+                    <strong>1. Dittonghi (ae, oe):</strong> Si pronunciano come la vocale <em>"E"</em> (es. <em>caelum</em> &rarr; "chelum", <em>poena</em> &rarr; "pena").
+                </div>
+                <div class="pronunciation-rule">
+                    <strong>2. Gruppo "ti" + vocale:</strong> Si pronuncia <em>"zi"</em> (es. <em>amicitia</em> &rarr; "amichizia"), tranne se preceduto da <em>s, t, x</em>.
+                </div>
+                <div class="pronunciation-rule">
+                    <strong>3. Gruppi ph, ch, th:</strong> Si pronunciano rispettivamente <em>F</em>, <em>K</em>, <em>T</em> (es. <em>philosophia</em> &rarr; "filosofia").
+                </div>
+
+                <h4 style="color: var(--gold); margin-top: 20px; margin-bottom: 15px;">Quesiti di Pronuncia:</h4>
+
+                <div style="margin-bottom: 18px;">
+                    <p>1. Come si pronuncia la parola latina <strong>"CAELUM"</strong> (cielo)?</p>
+                    <select id="s4-q1" style="margin-top: 5px;">
+                        <option value="">-- Scegli la pronuncia --</option>
+                        <option value="caelum">Caelum (pronunciando le lettere a ed e staccate)</option>
+                        <option value="chelum">Chelum (il dittongo ae si pronuncia e)</option>
+                        <option value="cailum">Cailum</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 18px;">
+                    <p>2. Come si pronuncia la parola latina <strong>"AMICITIA"</strong> (amicizia)?</p>
+                    <select id="s4-q2" style="margin-top: 5px;">
+                        <option value="">-- Scegli la pronuncia --</option>
+                        <option value="amicitia">Amicitia (con la t dura)</option>
+                        <option value="amichizia">Amichizia (il gruppo -ti- seguito da vocale si legge -zi-)</option>
+                        <option value="amissisia">Amissisia</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 18px;">
+                    <p>3. Nella parola latina <strong>"PHILOSOPHIA"</strong>, come si pronuncia il gruppo <em>"PH"</em>?</p>
+                    <select id="s4-q3" style="margin-top: 5px;">
+                        <option value="">-- Scegli la pronuncia --</option>
+                        <option value="f">Si pronuncia "F" (Filosofia)</option>
+                        <option value="p">Si pronuncia "P" (Pilosopia)</option>
+                        <option value="p-h">Si pronuncia P seguita da un'aspirazione</option>
+                    </select>
+                </div>
+
+                <div>
+                    <p>4. Nel nome <strong>"POENA"</strong> (pena/punizione), quante sillabe si pronunciano nel dittongo <em>"OE"</em>?</p>
+                    <select id="s4-q4" style="margin-top: 5px;">
+                        <option value="">-- Scegli la risposta --</option>
+                        <option value="due">Due sillabe distinte (O - E)</option>
+                        <option value="una">Una sola sillaba con il suono unico "E" (Pena)</option>
+                        <option value="silenzio">L'ultima lettera è muta</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn btn-action" onclick="checkRoom4()">Verifica Pronuncia</button>
+            <div class="feedback" id="feedback-4"></div>
+            <div class="digit-reveal" id="reveal-4">✨ QUARTA CIFRA DEL LUCCHETTO: <span id="digit-4-val" style="font-size: 1.5rem;"></span> ✨</div>
+        </div>
+
+        <!-- STANZA 5: LUCCHETTO FINALE -->
+        <div class="room-card" id="room-5">
+            <h2 class="room-title">Stanza V: Il Lucchetto della Tabula Verborum</h2>
+            <div class="story-text">
+                Sei arrivato davanti al grande portone del sapere antico! Inserisci la combinazione a 4 cifre che hai ottenuto risolvendo i quattro enigmi per aprire la cassaforte e completare l'Escape Room.
+            </div>
+
+            <div class="digit-lock-container">
+                <p style="color: var(--gold); font-family: 'Cinzel', serif;">INSERISCI IL CODICE DI 4 CIFRE:</p>
+                <div class="lock-digits">
+                    <input type="text" class="digit-input" id="code-1" maxlength="1" oninput="focusNext(this, 'code-2')">
+                    <input type="text" class="digit-input" id="code-2" maxlength="1" oninput="focusNext(this, 'code-3')">
+                    <input type="text" class="digit-input" id="code-3" maxlength="1" oninput="focusNext(this, 'code-4')">
+                    <input type="text" class="digit-input" id="code-4" maxlength="1" oninput="focusNext(this, 'code-1')">
+                </div>
+                <button class="btn btn-action" style="font-size: 1.1rem; padding: 12px 25px;" onclick="unlockVault()">🔓 APRI LA CASSAFORTE</button>
+            </div>
+
+            <div class="feedback" id="feedback-5"></div>
+
+            <!-- ATTESTATO FINALE -->
+            <div class="certificate" id="final-certificate">
+                <h2>MAGISTER VERBORUM</h2>
+                <h3>Attestato di Superamento Escape Room</h3>
+                <p>Si certifica che la studentessa / lo studente (o Squadra):</p>
+                <div class="certificate-name" id="student-name-display">DISCIPULUS ILLUSTRI</div>
+                <p>ha dimostrato eccellente conoscenza della lingua latina di base, decifrando correttamente i generi, i numeri, le abbreviazioni del vocabolario e le regole di pronuncia.</p>
+                <p style="margin-top: 20px; font-size: 0.9rem; color: #555;">Data: <span id="cert-date"></span> | Tempo impiegato: <span id="cert-time"></span></p>
+                <br>
+                <button class="btn btn-action" onclick="window.print()">🖨️ Stampa Attestato</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE PANNELLO DOCENTE -->
+    <div class="modal" id="teacher-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeTeacherModal()">&times;</span>
+            <h2 style="color: var(--gold); margin-bottom: 15px;">Pannello Docente & Impostazioni</h2>
+            <p style="margin-bottom: 15px; font-size: 0.9rem;">Da questo pannello puoi personalizzare il codice di sblocco finale, il tempo a disposizione e gestire le sessioni di classe.</p>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom: 5px;">Codice Soluzione Personalizzato (4 Cifre):</label>
+                <input type="text" id="teacher-code-input" value="7314" maxlength="4" style="padding: 8px; width: 100%; font-size: 1.1rem; background: #1a1622; color: #fff; border: 1px solid var(--border-color); border-radius: 4px;">
+                <small style="color: #aaa;">Codice default standard: <strong>7314</strong> (Stanza 1: 7, Stanza 2: 3, Stanza 3: 1, Stanza 4: 4).</small>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom: 5px;">Tempo di gioco (Minuti):</label>
+                <input type="number" id="teacher-time-input" value="45" min="5" max="120" style="padding: 8px; width: 100%; font-size: 1.1rem; background: #1a1622; color: #fff; border: 1px solid var(--border-color); border-radius: 4px;">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display:block; margin-bottom: 5px;">Nome Studente / Classe predefinito:</label>
+                <input type="text" id="teacher-student-input" value="Classe II A" style="padding: 8px; width: 100%; font-size: 1.1rem; background: #1a1622; color: #fff; border: 1px solid var(--border-color); border-radius: 4px;">
+            </div>
+
+            <button class="btn btn-action" onclick="saveTeacherSettings()">Salva Impostazioni</button>
+            <button class="btn" onclick="revealAllDigits()" style="margin-left: 10px;">Sblocca Tutte le Cifre (Demo)</button>
+        </div>
+    </div>
+
+    <script>
+        // --- STATO DEL GIOCO ---
+        let currentRoom = 1;
+        let hintsUsed = 0;
+        const maxHints = 3;
+        let timeRemaining = 45 * 60; // 45 minuti in secondi
+        let timerInterval = null;
+        let audioEnabled = true;
+
+        // Soluzione personalizzabile (4 cifre)
+        let targetCode = ["7", "3", "1", "4"];
+
+        // Risposte corrette Stanza 1
+        const room1Correct = {
+            masculinum: ['lupus', 'puer', 'amicus'],
+            femininum: ['rosa', 'puella', 'silva'],
+            neutrum: ['bellum', 'donum', 'templum']
+        };
+
+        // Selezione corrente Stanza 1
+        let selectedWordElem = null;
+        let selectedWordText = "";
+        let room1State = {
+            masculinum: [],
+            femininum: [],
+            neutrum: []
+        };
+
+        // Indizi per ogni stanza
+        const hints = {
+            1: "Osserva le uscite: le parole in -a sono generalmente femminili, quelle in -us/-er maschili, quelle in -um neutre.",
+            2: "Ricorda: la 1ª declinazione fa il plurale in -ae (rosa/rosae), la 2ª maschile in -i (lupus/lupi), e la 2ª neutra in -a (donum/dona).",
+            3: "Sul dizionario 'n.' sta per neutro, 'f.' per femminile, e la parola va cercata sempre al nominativo singolare (es. lupus e non lupi).",
+            4: "I dittonghi 'ae' e 'oe' si leggono entrambi 'E'. Il gruppo 'ti' seguito da vocale (come in amicitia) si pronuncia 'ZI'."
+        };
+
+        // --- SISTEMA AUDIO (WEB AUDIO API) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (!audioEnabled) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'success') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, audioCtx.currentTime); // A4
+                    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3); // A5
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'error') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.2);
+                } else if (type === 'unlock') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.15); // E5
+                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.3); // G5
+                    osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.45); // C6
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.8);
+                }
+            } catch(e) {
+                console.log("Audio non supportato o disabilitato.");
+            }
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            document.getElementById('audio-status').innerText = audioEnabled ? 'ON' : 'OFF';
+        }
+
+        // --- TIMER ---
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    timeRemaining = 0;
+                    alert("⏰ Tempo scaduto! Il segreto della Tabula Verborum è andato perduto. Riprova!");
+                }
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('timer').innerText = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // --- CAMBIO STANZA ---
+        function switchRoom(roomNum) {
+            currentRoom = roomNum;
+            document.querySelectorAll('.room-card').forEach(card => card.classList.remove('active'));
+            document.querySelectorAll('.room-tab').forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById(`room-${roomNum}`).classList.add('active');
+            document.getElementById(`tab-${roomNum}`).classList.add('active');
+        }
+
+        // --- STANZA 1 LOGICA ---
+        function selectWord(elem, word) {
+            if (selectedWordElem) {
+                selectedWordElem.classList.remove('selected');
+            }
+            selectedWordElem = elem;
+            selectedWordText = word;
+            elem.classList.add('selected');
+        }
+
+        function placeWord(zoneGender) {
+            if (!selectedWordText || !selectedWordElem) return;
+
+            // Rimuovi la parola da altre zone se già presente
+            for (let g in room1State) {
+                room1State[g] = room1State[g].filter(w => w !== selectedWordText);
+            }
+
+            // Aggiungi alla nuova zona
+            room1State[zoneGender].push(selectedWordText);
+
+            // Aggiorna interfaccia grafica
+            renderRoom1Zones();
+
+            // Nascondi la parola dalla griglia di selezione iniziale
+            selectedWordElem.style.display = 'none';
+            selectedWordElem = null;
+            selectedWordText = "";
+        }
+
+        function renderRoom1Zones() {
+            ['masculinum', 'femininum', 'neutrum'].forEach(g => {
+                const zone = document.getElementById(`zone-${g}`);
+                zone.innerHTML = '';
+                room1State[g].forEach(w => {
+                    const tag = document.createElement('span');
+                    tag.className = 'word-tag';
+                    tag.style.margin = '2px';
+                    tag.style.fontSize = '0.85rem';
+                    tag.innerText = w;
+                    zone.appendChild(tag);
+                });
+            });
+        }
+
+        function resetRoom1() {
+            room1State = { masculinum: [], femininum: [], neutrum: [] };
+            renderRoom1Zones();
+            document.querySelectorAll('#s1-words .word-tag').forEach(tag => {
+                tag.style.display = 'block';
+                tag.classList.remove('selected');
+            });
+            selectedWordElem = null;
+            selectedWordText = "";
+            document.getElementById('feedback-1').style.display = 'none';
+        }
+
+        function checkRoom1() {
+            let correct = true;
+            for (let g in room1Correct) {
+                if (room1State[g].length !== room1Correct[g].length) correct = false;
+                room1Correct[g].forEach(w => {
+                    if (!room1State[g].includes(w)) correct = false;
+                });
+            }
+
+            const fb = document.getElementById('feedback-1');
+            if (correct) {
+                fb.className = 'feedback correct';
+                fb.innerText = '✅ Perfetto! Hai distinto correttamente tutti i nomi maschili, femminili e neutri!';
+                document.getElementById('reveal-1').style.display = 'block';
+                document.getElementById('digit-1-val').innerText = targetCode[0];
+                document.getElementById('tab-1').classList.add('solved');
+                playSound('success');
+            } else {
+                fb.className = 'feedback incorrect';
+                fb.innerText = '❌ Alcuni nomi non sono collocati nel genere corretto. Controlla le terminazioni (-a, -us, -um) e riprova!';
+                playSound('error');
+            }
+        }
+
+        // --- STANZA 2 LOGICA ---
+        function checkRoom2() {
+            const m1 = document.getElementById('s2-match-1').value;
+            const m2 = document.getElementById('s2-match-2').value;
+            const m3 = document.getElementById('s2-match-3').value;
+            const m4 = document.getElementById('s2-match-4').value;
+            const m5 = document.getElementById('s2-match-5').value;
+
+            const fb = document.getElementById('feedback-2');
+
+            if (m1 === 'aquae' && m2 === 'lupi' && m3 === 'dona' && m4 === 'magistrae' && m5 === 'servi') {
+                fb.className = 'feedback correct';
+                fb.innerText = '✅ Bravissimo! Hai abbinato correttamente tutti i singolari con i rispettivi plurali!';
+                document.getElementById('reveal-2').style.display = 'block';
+                document.getElementById('digit-2-val').innerText = targetCode[1];
+                document.getElementById('tab-2').classList.add('solved');
+                playSound('success');
+            } else {
+                fb.className = 'feedback incorrect';
+                fb.innerText = '❌ C\'è qualche errore negli abbinamenti. Ricorda: 1ª declinazione plurale -ae, 2ª maschile -i, 2ª neutra -a.';
+                playSound('error');
+            }
+        }
+
+        // --- STANZA 3 LOGICA ---
+        function checkRoom3() {
+            const q1 = document.getElementById('s3-q1').value;
+            const q2 = document.getElementById('s3-q2').value;
+            const q3 = document.getElementById('s3-q3').value;
+            const q4 = document.getElementById('s3-q4').value;
+
+            const fb = document.getElementById('feedback-3');
+
+            if (q1 === 'neutro' && q2 === 'femminile' && q3 === 'lupus' && q4 === 'm') {
+                fb.className = 'feedback correct';
+                fb.innerText = '✅ Eccellente! Sai come si consulta il dizionario di latino!';
+                document.getElementById('reveal-3').style.display = 'block';
+                document.getElementById('digit-3-val').innerText = targetCode[2];
+                document.getElementById('tab-3').classList.add('solved');
+                playSound('success');
+            } else {
+                fb.className = 'feedback incorrect';
+                fb.innerText = '❌ Risposte non tutte corrette. Ricorda: n. = neutro, f. = femminile, m. = maschile e le parole si cercano al singolare!';
+                playSound('error');
+            }
+        }
+
+        // --- STANZA 4 LOGICA ---
+        function checkRoom4() {
+            const q1 = document.getElementById('s4-q1').value;
+            const q2 = document.getElementById('s4-q2').value;
+            const q3 = document.getElementById('s4-q3').value;
+            const q4 = document.getElementById('s4-q4').value;
+
+            const fb = document.getElementById('feedback-4');
+
+            if (q1 === 'chelum' && q2 === 'amichizia' && q3 === 'f' && q4 === 'una') {
+                fb.className = 'feedback correct';
+                fb.innerText = '✅ Ottimo! Conosci perfettamente le regole della pronuncia latina!';
+                document.getElementById('reveal-4').style.display = 'block';
+                document.getElementById('digit-4-val').innerText = targetCode[3];
+                document.getElementById('tab-4').classList.add('solved');
+                playSound('success');
+            } else {
+                fb.className = 'feedback incorrect';
+                fb.innerText = '❌ C\'è qualche errore di pronuncia. Rileggi attentamente i box delle regole in alto e riprova!';
+                playSound('error');
+            }
+        }
+
+        // --- LUCCHETTO E SBLOCCO FINALE ---
+        function focusNext(elem, nextId) {
+            if (elem.value.length >= 1) {
+                document.getElementById(nextId).focus();
+            }
+        }
+
+        function unlockVault() {
+            const d1 = document.getElementById('code-1').value;
+            const d2 = document.getElementById('code-2').value;
+            const d3 = document.getElementById('code-3').value;
+            const d4 = document.getElementById('code-4').value;
+
+            const inputCode = [d1, d2, d3, d4];
+            const fb = document.getElementById('feedback-5');
+
+            if (JSON.stringify(inputCode) === JSON.stringify(targetCode)) {
+                fb.className = 'feedback correct';
+                fb.innerText = '🎉 COMPLIMENTI! LA CASSAFORTE SI È APERTA! HAI COMPLETATO L\'ESCAPE ROOM LATINA!';
+                playSound('unlock');
+                
+                // Prepara attestato
+                const timeTakenMin = Math.floor((45 * 60 - timeRemaining) / 60);
+                const timeTakenSec = (45 * 60 - timeRemaining) % 60;
+                
+                document.getElementById('cert-date').innerText = new Date().toLocaleDateString('it-IT');
+                document.getElementById('cert-time').innerText = `${timeTakenMin}m ${timeTakenSec}s`;
+                document.getElementById('final-certificate').style.display = 'block';
+                document.getElementById('tab-5').classList.add('solved');
+
+                clearInterval(timerInterval);
+            } else {
+                fb.className = 'feedback incorrect';
+                fb.innerText = '🔒 Codice errato! Assicurati di aver risolto correttamente tutte e 4 le stanze precedenti.';
+                playSound('error');
+            }
+        }
+
+        // --- INDIZI ---
+        function requestHint() {
+            if (hintsUsed >= maxHints) {
+                alert("Hai esaurito gli indizi disponibili per questa partita!");
+                return;
+            }
+            if (currentRoom === 5) {
+                alert("Niente indizi per il lucchetto finale! Devi inserire le 4 cifre scoperte nelle stanze precedenti.");
+                return;
+            }
+
+            hintsUsed++;
+            document.getElementById('hint-count').innerText = `${hintsUsed} / ${maxHints}`;
+            alert(`💡 INDIZIO STANZA ${currentRoom}:\n\n${hints[currentRoom]}`);
+        }
+
+        // --- MODALE DOCENTE ---
+        function openTeacherModal() {
+            document.getElementById('teacher-modal').style.display = 'flex';
+        }
+
+        function closeTeacherModal() {
+            document.getElementById('teacher-modal').style.display = 'none';
+        }
+
+        function saveTeacherSettings() {
+            const newCode = document.getElementById('teacher-code-input').value;
+            if (newCode.length === 4 && !isNaN(newCode)) {
+                targetCode = newCode.split('');
+                alert(`Nuovo codice impostato: ${newCode}`);
+            } else {
+                alert("Il codice deve essere di 4 cifre numeriche!");
+                return;
+            }
+
+            const newTime = parseInt(document.getElementById('teacher-time-input').value);
+            if (newTime > 0) {
+                timeRemaining = newTime * 60;
+                updateTimerDisplay();
+            }
+
+            const studentName = document.getElementById('teacher-student-input').value;
+            document.getElementById('student-name-display').innerText = studentName;
+
+            closeTeacherModal();
+        }
+
+        function revealAllDigits() {
+            document.getElementById('reveal-1').style.display = 'block';
+            document.getElementById('digit-1-val').innerText = targetCode[0];
+            document.getElementById('reveal-2').style.display = 'block';
+            document.getElementById('digit-2-val').innerText = targetCode[1];
+            document.getElementById('reveal-3').style.display = 'block';
+            document.getElementById('digit-3-val').innerText = targetCode[2];
+            document.getElementById('reveal-4').style.display = 'block';
+            document.getElementById('digit-4-val').innerText = targetCode[3];
+            closeTeacherModal();
+        }
+
+        // --- AVVIO APP ---
+        window.onload = function() {
+            startTimer();
+        };
+    </script>
+</body>
+</html>
